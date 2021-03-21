@@ -1,0 +1,69 @@
+body {
+    background-color: #6d6d6d;
+    color: #ecba03;
+    background-image: linear-gradient(270deg, #a01000, blue);
+    font-size: 1.5em;
+}
+
+#title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.setup {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 50%;
+}
+
+.stats-container {
+    flex-direction: row;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.Str-container,
+.Dex-container,
+.Con-container,
+.Wis-container,
+.Int-container,
+.Cha-container {
+    display: flex;
+    justify-content: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    max-width: 15%;
+    min-width: 10%;
+    padding: 10px;
+}
+
+.stat {
+    padding-right: 10px;
+    color: #c9fdea;
+}
+
+.EquipList {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+}
+
+.AC {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: .5em;
+    align-self: center;
+}

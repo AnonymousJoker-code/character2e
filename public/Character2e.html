@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>2e Character Creater</title>
+</head>
+<body>
+    <h1 id="title">2e Quick Character Creater</h1>
+
+    <div class="setup">
+        <p>Min total score value: <input id="minStats" type="number" value="54"></p>
+        <p>Max total score value: <input id="maxStats" type="number" value="108"></p>
+        <p>Total score value: </p>
+        <p id="totalStats">0</p>
+    </div>
+    <button class="button" id="reroll" onClick=getStats()>Roll!</button>
+    <br>
+    <div class="stats-container">
+        <div class="Str-container">
+            <div class="stat">
+                <p id="stat-Str">STR: </p>
+            </div>
+            <p class="statVal" id="valStr">0</p>
+        </div>
+        <div class="Dex-container">
+            <div class="stat">
+                <p id="stat-Dex">DEX: </p>
+            </div>
+            <p class="statVal" id="valDex">0</p>
+        </div>
+        <div class="Con-container">
+            <div class="stat">
+                <p id="stat-Con">CON: </p>
+            </div>
+            <p class="statVal" id="valCon">0</p>
+        </div>
+        <div class="Wis-container">
+            <div class="stat">
+                <p id="stat-Wis">WIS: </p>
+            </div>
+            <p class="statVal" id="valWis">0</p>
+        </div>
+        <div class="Int-container">
+            <div class="stat">
+                <p id="stat-Int">INT: </p>
+            </div>
+            <p class="statVal" id="valInt">0</p>
+        </div>
+        <div class="Cha-container">
+            <div class="stat">
+                <p id="stat-Cha">CHA: </p>
+            </div>
+            <p class="statVal" id="valCha">0</p>
+        </div>
+    </div>
+
+    <div class="EquipList">
+        <p>Armor</p>
+        <input class="armor" id="armorList" list="armor" onChange=setAC()>
+            <datalist id="armor">
+            </datalist>
+        <!-- <input id="armorList" list="armor" onChange=setAC()>
+            <datalist class="armor" id="armor">
+            </datalist> -->
+        <p>Weapons</p>
+        <input list="weapon">
+            <datalist id="weapon">
+                <option value="Longsword"></option>
+            </datalist>
+    </div>
+    <div class="AC">
+        <p id="armorClass">AC: </p>
+        <p id="armorClassVal">10</p>
+    </div>
+    <!-- <input id="csv" type="file" onChange=setFile()> -->
+
+    <script src="node_modules/papaparse/papaparse.js"></script>
+    <script src="Character2e.js"></script>
+</body>
+</html>
