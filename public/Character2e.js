@@ -1,3 +1,9 @@
+let armorList = undefined
+
+window.onload = function(){
+    populateArmorList()
+}
+
 function roll() {
     let stat = 0
     for (let i = 0; i < 3; i++) {
@@ -30,9 +36,8 @@ function powerCheck(statValues) {
     }
 }
 
-
 function fillingEquipmentList(armorListJSON) {
-    const armorList = armorListJSON
+    armorList = armorListJSON
     for (let i = 0; i < armorList.length; i++) {
         document.getElementById("armor").insertAdjacentHTML("afterbegin", '<option value="' + armorList[i].Name + '"></option>')
     }
@@ -47,30 +52,6 @@ function setAC(){
     document.getElementById("armorClassVal").innerHTML = currentArmor.AC 
 }
 
-// const armorList = [{
-//     Name: 'Hide',
-//     AC: 6
-// },
-// {
-//     Name: 'Nekid',
-//     AC: 10
-// },
-// {
-//     Name: 'Plate',
-//     AC: 4
-// }]
-
-// function readCVS(selectedFile) {
-//   const reader = new FileReader();
-//   reader.addEventListener('load', (event) => {
-// 	console.log(reader.result)
-//   });
-//   reader.readAsText(selectedFile)
-// }
-
-
-// function setFile(){
-// 	const uploadedFile = document.getElementById("csv").files[0]
-// 	readCVS(uploadedFile)
-// }
-module.exports = {fillingEquipmentList}
+function populateArmorList(){
+    axios.get('/papa').then((res) => fillingEquipmentList(res.data.data))
+}
