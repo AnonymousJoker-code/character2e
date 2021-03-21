@@ -19,20 +19,29 @@ app.get('/test', async (req, res) => {
 })
 
 let armorParse = undefined
+let weaponParse = undefined
 
 const papaConfig = {
 	header: true,
 }
 
-const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=0&single=true&output=csv'
+const armorListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=0&single=true&output=csv'
+const weaponListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1660219728&single=true&output=csv'
 
-axios.get(url).then((res) => {
+axios.get(armorListUrl).then((res) => {
     armorParse = Papa.parse(res.data, papaConfig)
 })
 
-app.get('/papa', async (req, res) => {
+app.get('/armorlist', async (req, res) => {
     res.send(armorParse)
 })
 
+axios.get(weaponListUrl).then((res) => {
+    weaponParse = Papa.parse(res.data, papaConfig)
+})
+
+app.get('/weaponlist', async (req, res) => {
+    res.send(weaponParse)
+})
 
 app.listen(process.env.PORT || 3000)

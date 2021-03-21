@@ -1,7 +1,8 @@
 let armorList = undefined
+let weaponList = undefined
 
 window.onload = function(){
-    populateArmorList()
+    populateEquipmentList()
 }
 
 function roll() {
@@ -36,10 +37,26 @@ function powerCheck(statValues) {
     }
 }
 
-function fillingEquipmentList(armorListJSON) {
-    armorList = armorListJSON
+function populateEquipmentList(){
+    axios.get('/armorlist').then((res) => fillingArmorList(res.data.data))
+    axios.get('/weaponlist').then((res) => fillingWeaponList(res.data.data))
+}
+
+function fillingArmorList(armorList) {
+    armorList = armorList
+    armorList = armorList.sort(compare)
+    console.log(armorList)
+
     for (let i = 0; i < armorList.length; i++) {
-        document.getElementById("armor").insertAdjacentHTML("afterbegin", '<option value="' + armorList[i].Name + '"></option>')
+        document.getElementById("armor").insertAdjacentHTML("beforeend", '<option value="' + armorList[i].Name + '"></option>')
+    }
+}
+
+function fillingWeaponList(weaponList) {
+    weaponList = weaponList
+    weaponList = weaponList.sort(compare)
+    for (let i = 0; i < weaponList.length; i++) {
+        document.getElementById("weapon").insertAdjacentHTML("beforeend", '<option value="' + weaponList[i].Name + '"></option>')
     }
 }
 
@@ -52,6 +69,15 @@ function setAC(){
     document.getElementById("armorClassVal").innerHTML = currentArmor.AC 
 }
 
-function populateArmorList(){
-    axios.get('/papa').then((res) => fillingEquipmentList(res.data.data))
+function compare(a, b){
+    const itemA = a.Name
+    const itemB = b.Name
+
+    let comparison = 0
+    if(itemA > itemB){
+        comparison = 1
+    } else if(itemA < itemB){
+        comparison = -1
+    }
+    return comparison
 }
