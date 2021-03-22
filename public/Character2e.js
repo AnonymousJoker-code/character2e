@@ -42,9 +42,9 @@ function populateEquipmentList(){
     axios.get('/weaponlist').then((res) => fillingWeaponList(res.data.data))
 }
 
-function fillingArmorList(armorList) {
-    armorList = armorList
-    armorList = armorList.sort(compare)
+function fillingArmorList(armorListJSON) {
+    armorList = armorListJSON
+    //armorList = armorList.sort(compare)
     console.log(armorList)
 
     for (let i = 0; i < armorList.length; i++) {
@@ -52,9 +52,9 @@ function fillingArmorList(armorList) {
     }
 }
 
-function fillingWeaponList(weaponList) {
-    weaponList = weaponList
-    weaponList = weaponList.sort(compare)
+function fillingWeaponList(weaponListJSON) {
+    weaponList = weaponListJSON
+    //weaponList = weaponList.sort(compare)
     for (let i = 0; i < weaponList.length; i++) {
         document.getElementById("weapon").insertAdjacentHTML("beforeend", '<option value="' + weaponList[i].Name + '"></option>')
     }
@@ -62,7 +62,7 @@ function fillingWeaponList(weaponList) {
 
 function setAC(){
     let armor = document.getElementById("armorList").value
-    let currentArmor = armorList.find(wearing => wearing.Name === armor);
+    let currentArmor = armorList.find(wearing => wearing.Name == armor);
 
     console.log(currentArmor)	
 
