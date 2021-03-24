@@ -154,7 +154,7 @@ function isActualRace(raceRecordsOfActualRaces){
 function getRaceBonus(race){
     const statBonusRangeStart = 7
     const statBonusRangeEnd = 13
-
+    
     let bonus = []
     for(let j = statBonusRangeStart; j < statBonusRangeEnd; j++){
             let statBonus = race[j]
