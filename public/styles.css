@@ -1,3 +1,7 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 body {
     background-color: #6d6d6d;
     color: #ecba03;
@@ -66,4 +70,8 @@ body {
     justify-content: center;
     padding: .5em;
     align-self: center;
+}
+
+input>option:hover {
+    background-color: yellow;
 }

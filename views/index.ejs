@@ -54,6 +54,18 @@
     </div>
 </div>
 
+<div class="race-and-class">
+    <p>Races</p>
+    <input list="usable-races">
+        <datalist id="usable-races">
+        </datalist>
+        
+    <p>Classes</p>
+    <input list="usable-classes">
+        <datalist id="usable-classes">
+        </datalist>  
+</div>
+
 <div class="EquipList">
     <p>Armor</p>
     <input class="armor" id="armorList" list="armor" onChange=setAC()>
@@ -73,4 +85,3 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="Character2e.js"></script>
-<script src="parsing.js"></script>
