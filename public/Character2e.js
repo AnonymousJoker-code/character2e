@@ -60,6 +60,8 @@ function getStats() {
     for (let i = 0; i < statValues.length; i++) {
         statValues[i].innerHTML = rollCleaning('3d6')
     }
+    if(document.getElementById('selected-race') != null) document.getElementById('selected-race').value = ''
+    if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
     powerCheck(statValues)
 }
 
