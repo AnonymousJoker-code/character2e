@@ -54,24 +54,25 @@
     </div>
 </div>
 
-<div class="race-and-class">
-    <p>Races</p>
-    <input list="usable-races">
-        <datalist id="usable-races">
-        </datalist>
-        
-    <p>Classes</p>
-    <input list="usable-classes">
-        <datalist id="usable-classes">
-        </datalist>  
-</div>
+<fieldset class="race-and-class">
+    <legend>Race and Class</legend>
+        <label>Races</label>
+        <input id="selected-race" list="usable-races" onchange=classOptions()>
+            <datalist id="usable-races">
+            </datalist>
+            
+        <label>Classes</label>
+        <input list="usable-classes">
+            <datalist id="usable-classes">
+            </datalist>  
+</fieldset>
 
 <div class="EquipList">
     <p>Armor</p>
     <input class="armor" id="armorList" list="armor" onChange=setAC()>
         <datalist id="armor">
         </datalist>
-
+        
     <p>Weapons</p>
     <input list="weapon">
         <datalist id="weapon">

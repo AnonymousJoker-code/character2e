@@ -1,16 +1,17 @@
 let armorList = undefined
 let weaponList = undefined
 let raceList = undefined
+let classList = undefined
 
 window.onload = async function(){
-    await populateEquipmentList()
+    await getParsedData()
     getStats()
 }
 
 // Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
 
 function rollCleaning(die){
-let bonusRegex = /[-+*/]/
+    let bonusRegex = /[-+*/]/
     let bonus = 0
     let mathOperater = ''
    
@@ -23,7 +24,7 @@ let bonusRegex = /[-+*/]/
 
     let numDice = die.split('d')[0]
     let dieSides = die.split('d')[1]
-
+    
     return roll(numDice, dieSides, bonus, mathOperater)
 }
 
@@ -75,14 +76,15 @@ function powerCheck(statValues) {
         getStats()
     } else {
         document.getElementById("totalStats").innerHTML = statTotal
-        raceAndClassOptions()
+        raceOptions()
     }
 }
 
-async function populateEquipmentList(){
+async function getParsedData(){
     await axios.get('/armorlist').then((res) => fillingArmorList(res.data.data))
     await axios.get('/weaponlist').then((res) => fillingWeaponList(res.data.data))
-    await axios.get('/racelist').then((res) => assigningRaceList(res.data.data))
+    await axios.get('/racelist').then((res) => getRaceList(res.data.data))
+    await axios.get('/classlist').then((res) => getClassList(res.data.data))
 }
 
 // Building the datalist options for armor and weapons.
@@ -99,8 +101,7 @@ function insertIntoDataList(datalistId, header, sub){
 }
 
 function fillingWeaponList(weaponListJSON) {
-    weaponList = weaponListJSON
-    if(weaponList == undefined) 
+    if(weaponList == undefined) weaponList = weaponListJSON
     for (let i = 0; i < weaponList.length; i++) {
         insertIntoDataList('weapon', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
         | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
@@ -113,18 +114,22 @@ function setAC(){
     document.getElementById("armorClassVal").innerHTML = currentArmor.AC 
 }
 
-function assigningRaceList(raceListJSON){
+function getRaceList(raceListJSON){
     if(raceList == undefined) raceList = raceListJSON
 }
 
-function raceAndClassOptions(){
+function getClassList(classListJSON){
+    if(classList == undefined) classList = classListJSON
+}
+
+function raceOptions(){
     const statValues = document.getElementsByClassName("statVal")
     let possibleRaces = []
     const reqRange = 7
 
     // Testing the generated stats against the stat ranges that are required to be able to choose a certain race.
     for(let i = 0; i < raceList.length; i++){
-        let raceRecord = Object.entries(raceList[i])
+        const raceRecord = Object.entries(raceList[i])
         let statIndex = 0
         let passTest = 0
 
@@ -142,12 +147,60 @@ function raceAndClassOptions(){
     isActualRace(possibleRaces)
 }
 
+// For the Races that pass all 6 requirements, they are added to an array of actual races that can be applied to the generated statline.
 function isActualRace(raceRecordsOfActualRaces){
-    // For the Races that pass all 6 requirements, they are added to an array of actual races that can be applied to the generated statline.
     clearDatalist('usable-races')
     for(let i = 0; i < raceRecordsOfActualRaces.length; i++){
             let raceBonusArray = getRaceBonus(raceRecordsOfActualRaces[i])
             insertIntoDataList('usable-races', raceRecordsOfActualRaces[i][0][1], `${raceBonusArray[0]} ${raceBonusArray[1]}`)
+    }
+}
+
+function classOptions(){
+    const statValues = document.getElementsByClassName("statVal")
+    let statRangeStart = 1
+    let statRangeEnd = 7
+    let selectedRace = document.getElementById('selected-race').value
+    let availableClasses = []
+    let classRecord = []
+    let classToChooseFrom = []
+
+    // Filtering the available classes for the selected race.
+    for(let i = 0; i < raceList.length; i++){
+        if(Object.values(raceList)[i].Race == selectedRace) {
+            availableClasses = raceList[i].AvailableClasses.split(',')
+            break
+        }
+    }
+
+    // Getting the objects of the classes that can be selected from.
+    for(let i = 0; i < availableClasses.length; i++){
+        for(let j = 0; j < classList.length; j++){
+            if(availableClasses[i] == classList[j]['Class']){
+                classRecord.push(classList[j])
+                break
+            }
+        }
+    }
+
+    for(let j = 0; j < classRecord.length; j++){
+        let statIndex = 0
+        let passTest = 0
+
+        for(let i = statRangeStart; i < statRangeEnd; i++){
+            if(Number(statValues[statIndex].innerHTML) >= Number(Object.entries(classRecord[j])[i][1])) passTest++
+            statIndex++
+        }
+        if(passTest == 6) classToChooseFrom.push(classRecord[j])
+    } 
+
+    classChoices(classToChooseFrom)
+}
+
+function classChoices(classes){
+        clearDatalist('usable-classes')
+        for(let i = 0; i < classes.length; i++){
+            insertIntoDataList('usable-classes', Object.entries(classes[i])[0][1], '')
     }
 }
 

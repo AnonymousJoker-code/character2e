@@ -22,7 +22,6 @@ let armorParse = undefined
 let weaponParse = undefined
 let raceParse = undefined
 let classParse = undefined
-let raceClassReqParse = undefined
 
 const papaConfig = {
 	header: true,
@@ -32,8 +31,6 @@ const armorListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EB
 const weaponListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1660219728&single=true&output=csv'
 const raceListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1707483028&single=true&output=csv'
 const classListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=734079155&single=true&output=csv'
-const classRaceReqListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=918250155&single=true&output=csv'
-
 
 
 axios.get(armorListUrl).then((res) => {
@@ -66,14 +63,6 @@ axios.get(classListUrl).then((res) => {
 
 app.get('/classlist', async (req, res) => {
     res.send(classParse)
-})
-
-axios.get(classRaceReqListUrl).then((res) => {
-    classRaceReqParse = Papa.parse(res.data, papaConfig)
-})
-
-app.get('/classracereqlist', async (req, res) => {
-    res.send(classRaceReqParse)
 })
 
 app.listen(process.env.PORT || 3000)
