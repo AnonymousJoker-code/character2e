@@ -72,6 +72,11 @@ function getStats() {
     powerCheck(characterStats.reduce((a,b) => a + b))
 }
 
+// Really jank way of making datalist act like html select.  Change later.
+function raceChoices(){
+    if(document.getElementById('selected-race') != null) document.getElementById('selected-race').value = ''
+}
+
 function updateStats(){
     const statValues = document.getElementsByClassName("statVal")
 
@@ -79,6 +84,9 @@ function updateStats(){
         characterStatsDisplayed[i] = parseInt(characterStats[i]) + parseInt(characterStatsBonuses[i])
         statValues[i].innerHTML = characterStatsDisplayed[i]
     }
+    console.log(`${characterStats} Character rolled stats`)
+    console.log(`${characterStatsBonuses} Character racial bonuses`)
+    console.log(`${characterStatsDisplayed} Final character stat totals`)
 }
 
 // Checking the power level of the generated character based on the given values.
