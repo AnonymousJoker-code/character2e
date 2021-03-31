@@ -3,13 +3,20 @@ let weaponList = undefined
 let raceList = undefined
 let classList = undefined
 
+let characterStats = []
+let characterStatsBonuses = [0, 0, 0, 0, 0, 0]
+let characterStatsDisplayed = []
+
 window.onload = async function(){
     await getParsedData()
     getStats()
 }
 
-// Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
+function clearDatalist(datalistId){
+    document.getElementById(datalistId).innerHTML = ''
+}
 
+// Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
 function rollCleaning(die){
     let bonusRegex = /[-+*/]/
     let bonus = 0
@@ -29,7 +36,6 @@ function rollCleaning(die){
 }
 
 // Generating the dice rolls and applying the appropriate bonus/modifier.
-
 function roll(numDice, dieSides, bonus, mathOperater) {
     let stat = 0
     for (let i = 0; i < numDice; i++) {
@@ -53,33 +59,34 @@ function roll(numDice, dieSides, bonus, mathOperater) {
 }
 
 // Generating the stat values for the 6 base stats.  Also checking the power level of those generated stats.
-
 function getStats() {
-    const statValues = document.getElementsByClassName("statVal")
-
-    for (let i = 0; i < statValues.length; i++) {
-        statValues[i].innerHTML = rollCleaning('3d6')
+   for (let i = 0; i < 6; i++) {
+        characterStats[i] = rollCleaning('3d6')
     }
+
+    updateStats()
+
     if(document.getElementById('selected-race') != null) document.getElementById('selected-race').value = ''
     if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
-    powerCheck(statValues)
+
+    powerCheck(characterStats.reduce((a,b) => a + b))
+}
+
+function updateStats(){
+    const statValues = document.getElementsByClassName("statVal")
+
+    for(let i = 0; i < characterStatsBonuses.length; i++){
+        characterStatsDisplayed[i] = parseInt(characterStats[i]) + parseInt(characterStatsBonuses[i])
+        statValues[i].innerHTML = characterStatsDisplayed[i]
+    }
 }
 
 // Checking the power level of the generated character based on the given values.
+function powerCheck(statTotal) {
+    if (Math.abs(document.getElementById("minStats").value) > statTotal || Math.abs(document.getElementById("maxStats").value) < statTotal) getStats()
 
-function powerCheck(statValues) {
-    let statTotal = 0
-
-    for (let i = 0; i < statValues.length; i++) {
-        statTotal += Math.abs(statValues[i].innerHTML)
-    }
-
-    if (Math.abs(document.getElementById("minStats").value) > statTotal || Math.abs(document.getElementById("maxStats").value) < statTotal) {
-        getStats()
-    } else {
-        document.getElementById("totalStats").innerHTML = statTotal
-        raceOptions()
-    }
+    document.getElementById("totalStats").innerHTML = statTotal
+    raceOptions()
 }
 
 async function getParsedData(){
@@ -90,7 +97,6 @@ async function getParsedData(){
 }
 
 // Building the datalist options for armor and weapons.
-
 function fillingArmorList(armorListJSON) {
     if(armorList == undefined) armorList = armorListJSON
     for (let i = 0; i < armorList.length; i++) {
@@ -152,13 +158,41 @@ function raceOptions(){
 // For the Races that pass all 6 requirements, they are added to an array of actual races that can be applied to the generated statline.
 function isActualRace(raceRecordsOfActualRaces){
     clearDatalist('usable-races')
+    clearDatalist('usable-classes')
     for(let i = 0; i < raceRecordsOfActualRaces.length; i++){
             let raceBonusArray = getRaceBonus(raceRecordsOfActualRaces[i])
             insertIntoDataList('usable-races', raceRecordsOfActualRaces[i][0][1], `${raceBonusArray[0]} ${raceBonusArray[1]}`)
     }
 }
 
+function getRaceBonus(race){
+    const statBonusRangeStart = 7
+    const statBonusRangeEnd = 13
+    
+    let bonus = []
+    for(let j = statBonusRangeStart; j < statBonusRangeEnd; j++){
+            let statBonus = race[j]
+            if(statBonus[1] != 0) bonus.push(statBonus)
+    }
+    if(bonus.length == 0) return ['No','Race Bonus']
+    return bonus
+}
+
+function applyingRaceBonusesToStats(selectedRace){
+    selectedRace = Object.entries(selectedRace)
+    let racialStatChangesStart = 7
+    let racialStatChangesEnd = 13
+    let j = 0
+    
+    for(let i = racialStatChangesStart; i < racialStatChangesEnd; i++){
+        characterStatsBonuses[j] = selectedRace[i][1]
+        j++
+    }
+    updateStats()
+}
+
 function classOptions(){
+    if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
     const statValues = document.getElementsByClassName("statVal")
     let statRangeStart = 1
     let statRangeEnd = 7
@@ -170,6 +204,7 @@ function classOptions(){
     // Filtering the available classes for the selected race.
     for(let i = 0; i < raceList.length; i++){
         if(Object.values(raceList)[i].Race == selectedRace) {
+            applyingRaceBonusesToStats(raceList[i])
             availableClasses = raceList[i].AvailableClasses.split(',')
             break
         }
@@ -195,43 +230,11 @@ function classOptions(){
         }
         if(passTest == 6) classToChooseFrom.push(classRecord[j])
     } 
-
     classChoices(classToChooseFrom)
 }
 
 function classChoices(classes){
-        clearDatalist('usable-classes')
         for(let i = 0; i < classes.length; i++){
             insertIntoDataList('usable-classes', Object.entries(classes[i])[0][1], '')
     }
 }
-
-function getRaceBonus(race){
-    const statBonusRangeStart = 7
-    const statBonusRangeEnd = 13
-    
-    let bonus = []
-    for(let j = statBonusRangeStart; j < statBonusRangeEnd; j++){
-            let statBonus = race[j]
-            if(statBonus[1] != 0) bonus.push(statBonus)
-    }
-    if(bonus.length == 0) return ['No','Race Bonus']
-    return bonus
-}
-
-function clearDatalist(datalistId){
-    document.getElementById(datalistId).innerHTML = ''
-}
-
-// function compare(a, b){
-//     const itemA = a.Name
-//     const itemB = b.Name
-
-//     let comparison = 0
-//     if(itemA > itemB){
-//         comparison = 1
-//     } else if(itemA < itemB){
-//         comparison = -1
-//     }
-//     return comparison
-// }
