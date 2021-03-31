@@ -6,6 +6,8 @@ let classList = undefined
 let characterStats = []
 let characterStatsBonuses = [0, 0, 0, 0, 0, 0]
 let characterStatsDisplayed = []
+let characterStartingHP = 0
+let characterStartingGold = 0
 
 window.onload = async function(){
     await getParsedData()
@@ -17,7 +19,7 @@ function clearDatalist(datalistId){
 }
 
 // Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
-function rollCleaning(die){
+function roll(die){
     let bonusRegex = /[-+*/]/
     let bonus = 0
     let mathOperater = ''
@@ -32,11 +34,11 @@ function rollCleaning(die){
     let numDice = die.split('d')[0]
     let dieSides = die.split('d')[1]
     
-    return roll(numDice, dieSides, bonus, mathOperater)
+    return generateRoll(numDice, dieSides, bonus, mathOperater)
 }
 
 // Generating the dice rolls and applying the appropriate bonus/modifier.
-function roll(numDice, dieSides, bonus, mathOperater) {
+function generateRoll(numDice, dieSides, bonus, mathOperater) {
     let stat = 0
     for (let i = 0; i < numDice; i++) {
         stat += Math.ceil(Math.random() * dieSides)
@@ -61,7 +63,7 @@ function roll(numDice, dieSides, bonus, mathOperater) {
 // Generating the stat values for the 6 base stats.  Also checking the power level of those generated stats.
 function getStats() {
    for (let i = 0; i < 6; i++) {
-        characterStats[i] = rollCleaning('3d6')
+        characterStats[i] = roll('3d6')
     }
 
     updateStats()
@@ -198,7 +200,7 @@ function applyingRaceBonusesToStats(selectedRace){
 
 function classOptions(){
     if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
-    const statValues = document.getElementsByClassName("statVal")
+    
     let statRangeStart = 1
     let statRangeEnd = 7
     let selectedRace = document.getElementById('selected-race').value
@@ -208,7 +210,7 @@ function classOptions(){
 
     // Filtering the available classes for the selected race.
     for(let i = 0; i < raceList.length; i++){
-        if(Object.values(raceList)[i].Race == selectedRace) {
+        if(raceList[i].Race == selectedRace) {
             applyingRaceBonusesToStats(raceList[i])
             availableClasses = raceList[i].AvailableClasses.split(',')
             break
@@ -230,7 +232,7 @@ function classOptions(){
         let passTest = 0
 
         for(let i = statRangeStart; i < statRangeEnd; i++){
-            if(Number(statValues[statIndex].innerHTML) >= Number(Object.entries(classRecord[j])[i][1])) passTest++
+            if(Number(characterStatsDisplayed[statIndex]) >= Number(Object.entries(classRecord[j])[i][1])) passTest++
             statIndex++
         }
         if(passTest == 6) classToChooseFrom.push(classRecord[j])
@@ -243,4 +245,46 @@ function classChoices(classes){
         for(let i = 0; i < classes.length; i++){
             insertIntoDataList('usable-classes', Object.entries(classes[i])[0][1], '')
     }
+}
+
+function startingValues(){
+    let classJSON = []
+    let selectedClass = document.getElementById('selected-class').value
+
+    for(let i = 0; i < classList.length; i++){
+        if(classList[i].Class == selectedClass){
+            classJSON = classList[i]
+            break
+        }
+    }
+    classJSON = Object.entries(classJSON)
+    characterStartingHP = getStartingHP(classJSON)
+    characterStartingGold = getStartingGold(classJSON)
+    setStartingValues()
+}
+
+function getStartingHP(selectedClassJSON){
+    const startingHPLocation = 7
+    return roll(selectedClassJSON[startingHPLocation][1])
+}
+
+function getStartingGold(selectedClassJSON){
+    const startingGoldLocation = 8
+    return roll(selectedClassJSON[startingGoldLocation][1])
+}
+
+function setStartingValues(){
+    document.getElementById('value-starting-gold').innerText = characterStartingGold
+    document.getElementById('value-starting-hp').innerText = characterStartingHP
+}
+
+// fun little stat line to test the system.  Remove before pushing.
+function noClassOptionsStatLine(){
+    characterStats = [8, 6, 18, 7, 8, 8]
+    characterStatsBonuses = [0, 0, 0, 0, 0, 0]
+    updateStats()
+    if(document.getElementById('selected-race') != null) document.getElementById('selected-race').value = ''
+    if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
+
+    powerCheck(characterStats.reduce((a,b) => a + b))
 }

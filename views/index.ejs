@@ -62,9 +62,21 @@
             </datalist>
             
         <label>Classes</label>
-        <input id="selected-class" list="usable-classes">
+        <input id="selected-class" list="usable-classes" onchange=startingValues()>
             <datalist id="usable-classes">
-            </datalist>  
+            </datalist>
+        <div class="starting-class">
+            <div class="starting-title">
+                <p id="starting-hp-text">Starting HP: </p>
+            </div>
+            <p class="starting-gold-hp" id="value-starting-hp">0</p>
+        </div> 
+        <div class="starting-class">
+            <div class="starting-title">
+                <p id="starting-gold-text">Starting Gold: </p>
+            </div>
+            <p class="starting-gold-value" id="value-starting-gold">0</p>
+        </div>
 </fieldset>
 
 <div class="EquipList">

@@ -72,6 +72,18 @@ body {
     align-self: center;
 }
 
+.starting-class {
+    display: inline-flex;
+    justify-content: center;
+    max-width: 15%;
+    min-width: 10%;
+    padding: 5px;
+}
+
+.starting-title {
+    padding-right: 10px;
+}
+
 input>option:hover {
     background-color: yellow;
 }
