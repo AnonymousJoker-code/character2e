@@ -46,16 +46,12 @@ function generateRoll(numDice, dieSides, bonus, mathOperater) {
     switch(mathOperater){
         case '+':
             return stat + Number(bonus)
-            break
         case '-':
             return stat - Number(bonus)
-            break
         case '*':
             return stat * Number(bonus)
-            break
         case '/':
             return stat / Number(bonus)
-            break
     }
     return stat + Number(bonus)
 }
@@ -103,23 +99,31 @@ async function getParsedData(){
     await axios.get('/classlist').then((res) => getClassList(res.data.data))
 }
 
-// Building the datalist options for armor and weapons.
-function fillingArmorList(armorListJSON) {
-    if(armorList == undefined) armorList = armorListJSON
-    for (let i = 0; i < armorList.length; i++) {
-        insertIntoDataList('armor', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
-    }
-}
-
 function insertIntoDataList(datalistId, header, sub){
     document.getElementById(datalistId).insertAdjacentHTML("beforeend", `<option value="${header}">${sub}</option>`)
 }
 
+// Building the datalist options for armor and weapons.
+function fillingArmorList(armorListJSON) {
+    if(armorList == undefined) armorList = armorListJSON
+    if(armorList == undefined) axios.get('/armorlist').then((res) => fillingArmorList(res.data.data))
+
+    if(armorList != undefined){
+        for (let i = 0; i < armorList.length; i++) {
+            insertIntoDataList('armor', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
+        }
+    }
+}
+
 function fillingWeaponList(weaponListJSON) {
     if(weaponList == undefined) weaponList = weaponListJSON
-    for (let i = 0; i < weaponList.length; i++) {
-        insertIntoDataList('weapon', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
-        | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
+    if(weaponList == undefined) axios.get('/weaponlist').then((res) => fillingWeaponList(res.data.data))
+
+    if(weaponList != undefined){
+        for (let i = 0; i < weaponList.length; i++) {
+            insertIntoDataList('weapon', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
+            | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
+        }
     }
 }
 
@@ -131,10 +135,12 @@ function setAC(){
 
 function getRaceList(raceListJSON){
     if(raceList == undefined) raceList = raceListJSON
+    if(raceList == undefined) axios.get('/racelist').then((res) => getRaceList(res.data.data))
 }
 
 function getClassList(classListJSON){
     if(classList == undefined) classList = classListJSON
+    if(classList == undefined) axios.get('/classlist').then((res) => getClassList(res.data.data))
 }
 
 function raceOptions(){
@@ -177,8 +183,8 @@ function getRaceBonus(race){
     const statBonusRangeEnd = 13
     
     let bonus = []
-    for(let j = statBonusRangeStart; j < statBonusRangeEnd; j++){
-            let statBonus = race[j]
+    for(let i = statBonusRangeStart; i < statBonusRangeEnd; i++){
+            let statBonus = race[i]
             if(statBonus[1] != 0) bonus.push(statBonus)
     }
     if(bonus.length == 0) return ['No','Race Bonus']
@@ -189,8 +195,8 @@ function applyingRaceBonusesToStats(selectedRace){
     selectedRace = Object.entries(selectedRace)
     let racialStatChangesStart = 7
     let racialStatChangesEnd = 13
+ 
     let j = 0
-    
     for(let i = racialStatChangesStart; i < racialStatChangesEnd; i++){
         characterStatsBonuses[j] = selectedRace[i][1]
         j++
@@ -207,6 +213,8 @@ function classOptions(){
     let availableClasses = []
     let classRecord = []
     let classToChooseFrom = []
+
+    
 
     // Filtering the available classes for the selected race.
     for(let i = 0; i < raceList.length; i++){
@@ -233,6 +241,8 @@ function classOptions(){
 
         for(let i = statRangeStart; i < statRangeEnd; i++){
             if(Number(characterStatsDisplayed[statIndex]) >= Number(Object.entries(classRecord[j])[i][1])) passTest++
+            console.log(Object.entries(classRecord[j])[i][1])
+            console.log(Object.entries(classRecord[j]))
             statIndex++
         }
         if(passTest == 6) classToChooseFrom.push(classRecord[j])
