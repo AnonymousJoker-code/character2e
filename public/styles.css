@@ -25,6 +25,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* margin-left: 50%; */
+}
+
+#reroll {
     margin-left: 50%;
 }
 
@@ -61,6 +65,7 @@ body {
     justify-content: center;
     align-items: center;
     margin-top: 1em;
+    opacity: 0;
 }
 
 .AC {
@@ -70,6 +75,7 @@ body {
     justify-content: center;
     padding: .5em;
     align-self: center;
+    opacity: 0;
 }
 
 .race-and-class {
@@ -84,6 +90,18 @@ body {
     max-width: 15%;
     min-width: 10%;
     padding: 5px;
+}
+
+.cost-button-display {
+    display: inline-flex;
+    justify-content: center;
+    max-width: 15%;
+    min-width: 10%;
+    padding: 5px;
+}
+
+#starting-cost-text {
+    padding-right: 10px;
 }
 
 .starting-title {

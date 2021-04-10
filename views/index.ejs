@@ -65,12 +65,14 @@
         <input id="selected-class" list="usable-classes" onchange=startingValues()>
             <datalist id="usable-classes">
             </datalist>
+
         <div class="starting-class">
             <div class="starting-title">
                 <p id="starting-hp-text">Starting HP: </p>
             </div>
             <p class="starting-gold-hp" id="value-starting-hp">0</p>
-        </div> 
+        </div>
+
         <div class="starting-class">
             <div class="starting-title">
                 <p id="starting-gold-text">Starting Gold: </p>
@@ -79,19 +81,29 @@
         </div>
 </fieldset>
 
-<div class="EquipList">
-    <p>Armor</p>
-    <input class="armor" id="armorList" list="armor" onChange=setAC()>
-        <datalist id="armor">
-        </datalist>
-        
-    <p>Weapons</p>
-    <input list="weapon">
-        <datalist id="weapon">
-        </datalist>
-</div>
+<fieldset class="EquipList" id="EquipmentList">
+    <legend>Equipment Shop</legend>
+        <label>Armor</label>
+        <input class="armor" id="armor" list="armorList" onchange=buyingEquipmentPreview()>
+            <datalist id="armorList">
+            </datalist>
+            
+        <label>Weapons</label>
+        <input id="weapon" list="weaponList" onchange=buyingEquipmentPreview()>
+            <datalist id="weaponList">
+            </datalist>
 
-<div class="AC">
+        <button class="button" id="buy" onclick=buyingEquipment()>Buy!</button>
+
+        <div class="cost-button-display">
+            <div class="starting-items-cost">
+                <p id="starting-cost-text">Cost: </p>
+            </div>
+            <p class="starting-cost-value" id="cost">0</p>
+        </div>
+</fieldset>
+
+<div class="AC" id="AC">
     <p id="armorClass">AC: </p>
     <p id="armorClassVal">10</p>
 </div>
