@@ -81,7 +81,7 @@
         </div>
 </fieldset>
 
-<fieldset class="EquipList" id="EquipmentList">
+<fieldset class="EquipList" id="EquipmentShop">
     <legend>Equipment Shop</legend>
         <label>Armor</label>
         <input class="armor" id="armor" list="armorList" onchange=buyingEquipmentPreview()>
@@ -107,6 +107,13 @@
     <p id="armorClass">AC: </p>
     <p id="armorClassVal">10</p>
 </div>
+
+<div>
+    <dl id="EquipmentList">
+
+    </dl>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="Character2e.js"></script>

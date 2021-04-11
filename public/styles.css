@@ -3,9 +3,9 @@
 }
 
 body {
-    background-color: #6d6d6d;
+    background-color: #131313;
     color: #ecba03;
-    background-image: linear-gradient(270deg, #a01000, blue);
+    /* background-image: linear-gradient(270deg, #a01000, blue); */
     font-size: 1.5em;
 }
 
@@ -108,6 +108,6 @@ body {
     padding-right: 10px;
 }
 
-input>option:hover {
-    background-color: yellow;
+.Equipment {
+    padding: 0 0 10px 10px;
 }

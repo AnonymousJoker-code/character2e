@@ -17,6 +17,13 @@ window.onload = async function(){
     getStats()
 }
 
+async function getParsedData(){
+    await axios.get('/armorlist').then((res) => getArmorList(res.data.data))
+    await axios.get('/weaponlist').then((res) => getWeaponList(res.data.data))
+    await axios.get('/racelist').then((res) => getRaceList(res.data.data))
+    await axios.get('/classlist').then((res) => getClassList(res.data.data))
+}
+
 function clearDatalist(datalistId){
     document.getElementById(datalistId).innerHTML = ''
     document.getElementById('value-starting-gold').innerText = 0
@@ -46,7 +53,7 @@ function roll(die){
 }
 
 // Generating the dice rolls and applying the appropriate bonus/modifier.
-function generateRoll(numDice, dieSides, bonus, mathOperater) {
+function generateRoll(numDice, dieSides, bonus, mathOperater){
     let stat = 0
     for (let i = 0; i < numDice; i++) {
         stat += Math.ceil(Math.random() * dieSides)
@@ -65,7 +72,7 @@ function generateRoll(numDice, dieSides, bonus, mathOperater) {
 }
 
 // Generating the stat values for the 6 base stats.  Also checking the power level of those generated stats.
-function getStats() {
+function getStats(){
    for (let i = 0; i < 6; i++) {
         characterStats[i] = roll('3d6')
     }
@@ -93,18 +100,11 @@ function updateStats(){
 }
 
 // Checking the power level of the generated character based on the given values.
-function powerCheck(statTotal) {
+function powerCheck(statTotal){
     if (Math.abs(document.getElementById("minStats").value) > statTotal || Math.abs(document.getElementById("maxStats").value) < statTotal) getStats()
 
     document.getElementById("totalStats").innerHTML = statTotal
     raceOptions()
-}
-
-async function getParsedData(){
-    await axios.get('/armorlist').then((res) => getArmorList(res.data.data))
-    await axios.get('/weaponlist').then((res) => getWeaponList(res.data.data))
-    await axios.get('/racelist').then((res) => getRaceList(res.data.data))
-    await axios.get('/classlist').then((res) => getClassList(res.data.data))
 }
 
 function getArmorList(armorListJSON){
@@ -131,8 +131,12 @@ function insertIntoDataList(datalistId, header, sub){
     document.getElementById(datalistId).insertAdjacentHTML("beforeend", `<option value="${header}">${sub}</option>`)
 }
 
+function insertIntoEquipmentList(EquipmentListId, header, sub){
+    document.getElementById(EquipmentListId).insertAdjacentHTML("beforeend", `<dt class="Equipment">${header}</dt><dd class="Equipment">${sub}</dd>`)
+}
+
 // Building the datalist options for armor and weapons.
-function fillingArmorList() {
+function fillingArmorList(){
     if(armorList != undefined){
         for (let i = 0; i < armorList.length; i++) {
             if(parseInt(armorList[i].Cost) < characterStartingGold) insertIntoDataList('armorList', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
@@ -140,7 +144,7 @@ function fillingArmorList() {
     }
 }
 
-function fillingWeaponList() {
+function fillingWeaponList(){
     if(weaponList != undefined){
         for (let i = 0; i < weaponList.length; i++) {
             if(parseInt(weaponList[i].Cost) < characterStartingGold) insertIntoDataList('weaponList', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
@@ -332,14 +336,33 @@ function buyingEquipmentPreview(){
 }
 
 function buyingEquipment(){
-    let cost = document.getElementById('cost').innerText
-    let armor = document.getElementById('armor').value
-    let weapon = document.getElementById('weapon').value
+    let cost = parseFloat(document.getElementById('cost').innerText)
+
+    for (let i = 0; i < weaponList.length; i++) {
+        if(weaponList[i].Name == document.getElementById('weapon').value) {
+            insertIntoEquipmentList('EquipmentList', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
+        | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
+        break
+        }
+    }
+
+    for (let i = 0; i < armorList.length; i++) {
+        if(armorList[i].Name == document.getElementById('armor').value){
+            insertIntoEquipmentList('EquipmentList', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
+            break
+        }
+    }
+
 
     document.getElementById('cost').innerText = 0
     document.getElementById('armor').value = ''
     document.getElementById('weapon').value = ''
 }
+
+
+
+
+
 
 // fun little stat line to test the system.  Remove before pushing.
 function noClassOptionsStatLine(){
@@ -364,7 +387,7 @@ function listUndefinedErrorHandlerBS(){
 
 // Playing around with 'staging' the build
 function unhidingEquipList(){
-    let x = document.getElementById('EquipmentList')
+    let x = document.getElementById('EquipmentShop')
     // x = x.style.display
     if(x.style.opacity == 0) {
         x.style.opacity = 1
