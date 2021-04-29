@@ -2,12 +2,23 @@ let armorList = undefined
 let weaponList = undefined
 let raceList = undefined
 let classList = undefined
+let abilityScoreChart = undefined
+let thac0List = undefined
 
 let characterStats = []
 let characterStatsBonuses = [0, 0, 0, 0, 0, 0]
 let characterStatsDisplayed = []
 let characterStartingHP = 0
-let characterStartingGold = 0
+let characterGold = 0
+let characterThac0 = 0
+
+let strAbilityScoreObject = undefined
+let dexAbilityScoreObject = undefined
+let conAbilityScoreObject = undefined
+let intAbilityScoreObject = undefined
+let wisAbilityScoreObject = undefined
+let chaAbilityScoreObject = undefined
+let characterObject = undefined
 
 // Remove Later
 let undefinedBS = setInterval(listUndefinedErrorHandlerBS(), 1000)
@@ -22,53 +33,79 @@ async function getParsedData(){
     await axios.get('/weaponlist').then((res) => getWeaponList(res.data.data))
     await axios.get('/racelist').then((res) => getRaceList(res.data.data))
     await axios.get('/classlist').then((res) => getClassList(res.data.data))
+    await axios.get('/abilityscorecharts').then((res) => getAbilityScoreCharts(res.data.data))
+    await axios.get('/thac0').then((res) => getThac0(res.data.data))
 }
 
-function clearDatalist(datalistId){
-    document.getElementById(datalistId).innerHTML = ''
+function clearHTMLElement(elementId){
+    document.getElementById(elementId).innerHTML = ''
+}
+
+function nukeEverything(){
+    let x = document.getElementById('EquipmentShop')
+    if(x.style.opacity == 1) {
+        x.style.opacity = 0
+        document.getElementById('AC').style.opacity = 0
+    }
+    setAC(10)
+    clearHTMLElement('EquipmentList')
+    clearHTMLElement('armor')
+    clearHTMLElement('weapon')
     document.getElementById('value-starting-gold').innerText = 0
     document.getElementById('value-starting-hp').innerText = 0
 }
 
 // Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
-// Need to fix mage gold input i.e. 1d4+1*10... more than one bonus isnt handle correctly. Work around is if characterStartingGold is < 6... so a mage it does the * 10 afterwards.
 function roll(die){
-    let bonusRegex = /[-+*/]/
-    let bonus = 0
-    let mathOperater = ''
-    let mathOperaterIndex = 0
-   
+    let mathRegex = /[-+*/]/
+    let valuesArray = die.split(mathRegex)
+    let mathOpArray = []
 
-    if(bonusRegex.test(die)){
-        mathOperater = die.match(bonusRegex)[0]
-        mathOperaterIndex = die.match(bonusRegex).index
-        bonus = die.split(bonusRegex)[1]
-        die = die.split(bonusRegex)[0]
+    for(let i = 0; i < die.length; i++){
+      if(die[i].match(mathRegex)){
+        mathOpArray.push(die[i])
+      }
     }
 
-    let numDice = die.split('d')[0]
-    let dieSides = die.split('d')[1]
-    
-    return generateRoll(numDice, dieSides, bonus, mathOperater)
+    for(let i = 0; i < valuesArray.length; i++){
+        if(valuesArray[i].match(/d/)) {
+            valuesArray[i] = dieRolling(valuesArray[i])
+            }
+    }
+
+    let counter = 0
+    let b1 =  0, b2 = 0
+    while(valuesArray.length > 1){
+        b1 = parseInt(valuesArray.shift())
+        b2 = parseInt(valuesArray[0])
+        valuesArray[0] = switchMath(b1, b2, mathOpArray[counter])
+        counter++
+    }
+    return Math.floor(valuesArray[0])
 }
 
-// Generating the dice rolls and applying the appropriate bonus/modifier.
-function generateRoll(numDice, dieSides, bonus, mathOperater){
-    let stat = 0
+function dieRolling(die){
+  let numDice = die.split('d')[0]
+  let dieSides = die.split('d')[1]
+
+  let rolled = 0
     for (let i = 0; i < numDice; i++) {
-        stat += Math.ceil(Math.random() * dieSides)
+        rolled += Math.ceil(Math.random() * dieSides)
     }
+  return rolled
+}
+
+function switchMath(value1, value2, mathOperater){
     switch(mathOperater){
         case '+':
-            return stat + Number(bonus)
+            return value1 + value2
         case '-':
-            return stat - Number(bonus)
+            return value1 - value2
         case '*':
-            return stat * Number(bonus)
+            return value1 * value2
         case '/':
-            return stat / Number(bonus)
+            return value1 / value2
     }
-    return stat + Number(bonus)
 }
 
 // Generating the stat values for the 6 base stats.  Also checking the power level of those generated stats.
@@ -78,6 +115,7 @@ function getStats(){
     }
 
     updateStats()
+    nukeEverything()
 
     if(document.getElementById('selected-race') != null) document.getElementById('selected-race').value = ''
     if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
@@ -97,11 +135,15 @@ function updateStats(){
         characterStatsDisplayed[i] = parseInt(characterStats[i]) + parseInt(characterStatsBonuses[i])
         statValues[i].innerHTML = characterStatsDisplayed[i]
     }
+    aggregatingAbilityScoreChart()
 }
 
 // Checking the power level of the generated character based on the given values.
 function powerCheck(statTotal){
-    if (Math.abs(document.getElementById("minStats").value) > statTotal || Math.abs(document.getElementById("maxStats").value) < statTotal) getStats()
+    if (Math.abs(document.getElementById("minStats").value) > statTotal || Math.abs(document.getElementById("maxStats").value) < statTotal) {
+        getStats()
+        return
+    }
 
     document.getElementById("totalStats").innerHTML = statTotal
     raceOptions()
@@ -127,35 +169,50 @@ function getWeaponList(weaponListJSON){
     if(weaponList == undefined) axios.get('/weaponlist').then((res) => getWeaponList(res.data.data))
 }
 
+function getAbilityScoreCharts(abilityScoreChartsJSON){
+    if(abilityScoreChart == undefined) abilityScoreChart = abilityScoreChartsJSON
+    if(abilityScoreChart == undefined) axios.get('/abilityscorecharts').then((res) => getAbilityScoreCharts(res.data.data))
+}
+
+function getThac0(thac0JSON){
+    if(thac0List == undefined) thac0List = thac0JSON
+    if(thac0List == undefined) axios.get('/thac0').then((res) => getThac0(res.data.data))
+}
+
+// Functions to build HTML elements
 function insertIntoDataList(datalistId, header, sub){
     document.getElementById(datalistId).insertAdjacentHTML("beforeend", `<option value="${header}">${sub}</option>`)
 }
 
 function insertIntoEquipmentList(EquipmentListId, header, sub){
-    document.getElementById(EquipmentListId).insertAdjacentHTML("beforeend", `<dt class="Equipment">${header}</dt><dd class="Equipment">${sub}</dd>`)
+    document.getElementById(EquipmentListId).insertAdjacentHTML("beforeend", `<dt class="Equipment" id="${header}">${header}</dt><dd class="Equipment">${sub}</dd>`)
+}
+
+function insertIntoAbilityScoreList(abilityScoreChartId, divId,pId, title){
+    document.getElementById(abilityScoreChartId).insertAdjacentHTML("beforeend", `<div id="${divId}"><p id="${pId}">${title}</p></div>`)
 }
 
 // Building the datalist options for armor and weapons.
 function fillingArmorList(){
     if(armorList != undefined){
+        clearHTMLElement('armorList')
         for (let i = 0; i < armorList.length; i++) {
-            if(parseInt(armorList[i].Cost) < characterStartingGold) insertIntoDataList('armorList', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
+            if(parseInt(armorList[i].Cost) < characterGold) insertIntoDataList('armorList', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
         }
     }
 }
 
 function fillingWeaponList(){
     if(weaponList != undefined){
+        clearHTMLElement('weaponList')
         for (let i = 0; i < weaponList.length; i++) {
-            if(parseInt(weaponList[i].Cost) < characterStartingGold) insertIntoDataList('weaponList', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
+            if(parseInt(weaponList[i].Cost) < characterGold) insertIntoDataList('weaponList', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
             | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
         }
     }
 }
 
 function setAC(currentArmor){
-    // let armor = document.getElementById("armor").value
-    // let currentArmor = armorList.find(wearing => wearing.Name == armor);
     if(currentArmor != undefined) document.getElementById("armorClassVal").innerHTML = currentArmor
 }
 
@@ -199,8 +256,8 @@ function raceOptions(){
 
 // For the Races that pass all 6 requirements, they are added to an array of actual races that can be applied to the generated statline.
 function isActualRace(raceRecordsOfActualRaces){
-    clearDatalist('usable-races')
-    clearDatalist('usable-classes')
+    clearHTMLElement('usable-races')
+    clearHTMLElement('usable-classes')
     for(let i = 0; i < raceRecordsOfActualRaces.length; i++){
             let raceBonusArray = getRaceBonus(raceRecordsOfActualRaces[i])
             insertIntoDataList('usable-races', raceRecordsOfActualRaces[i][0][1], `${raceBonusArray[0]} ${raceBonusArray[1]}`)
@@ -235,7 +292,7 @@ function applyingRaceBonusesToStats(selectedRace){
 
 function classOptions(){
     if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
-    clearDatalist('armorList')
+    clearHTMLElement('armorList')
     
     let statRangeStart = 1
     let statRangeEnd = 7
@@ -279,10 +336,106 @@ function classOptions(){
 }
 
 function classChoices(classes){
-    clearDatalist('usable-classes')
+    clearHTMLElement('usable-classes')
     for(let i = 0; i < classes.length; i++){
         insertIntoDataList('usable-classes', Object.entries(classes[i])[0][1], '')
     }
+}
+
+function aggregatingAbilityScoreChart(){
+    let abilityScoreLineAggregate = []
+
+    for(let j = 0; j < 6; j++){    
+        for(let i = 0; i < abilityScoreChart.length; i++){
+            if(abilityScoreChart[i].AbilityScore == characterStatsDisplayed[j]) abilityScoreLineAggregate.push(abilityScoreChart[i])
+        }
+    }
+    filterAggragatedAbilityScoreChart(abilityScoreLineAggregate)
+}
+
+function filterAggragatedAbilityScoreChart(chart){
+    let str = chart[0]
+    let dex = chart[1]
+    let con = chart[2]
+    let int = chart[3]
+    let wis = chart[4]
+    let cha = chart[5]
+
+    let strReg = ['Str:HitProbability', 'Str:DamageAdjustment', 'Str:WeightAllowance', 'Str:MaximumPress', 'Str:OpenDoors', 'Str:BendBarsLiftGates']
+    let dexReg = ['Dex:ReactionAdjustment', 'Dex:MissileAttackAdjustment', 'Dex:DefensiveAdjustment']
+    let conReg = ['Con:HitPointAdjustment', 'Con:SystemShock', 'Con:ResurrectionSurvival', 'Con:PoisonSave', 'Con:Regeneration', 'Con:SavingThrowBonus']
+    let intReg = ['Int:NumberOfLanguages', 'Int:SpellLevel', 'Int:ChangeToLearnSpell', 'Int:MaximumNumberOfSpellsPerLevel', 'Int:IllusionImmunity']
+    let wisReg = ['Wis:MagicalDefenseAdjustment', 'Wis:BonusSpells', 'Wis:ChanceOfSpellFailure', 'Wis:SpellImmunity']
+    let chaReg = ['Cha:MaximumNumberOfHenchmen', 'Cha:LoyaltyBase', 'Cha:ReactionAdjustment']
+  
+    strAbilityScoreObject = getObjectOfAbilityScoreChart(str, strReg)
+    dexAbilityScoreObject = getObjectOfAbilityScoreChart(dex, dexReg)
+    conAbilityScoreObject = getObjectOfAbilityScoreChart(con, conReg)
+    intAbilityScoreObject = getObjectOfAbilityScoreChart(int, intReg)
+    wisAbilityScoreObject = getObjectOfAbilityScoreChart(wis, wisReg)
+    chaAbilityScoreObject = getObjectOfAbilityScoreChart(cha, chaReg)
+
+    characterObject = {
+        strAbilityScoreObject,
+        dexAbilityScoreObject,
+        conAbilityScoreObject,
+        intAbilityScoreObject,
+        wisAbilityScoreObject,
+        chaAbilityScoreObject
+    }
+    console.log(characterObject["strAbilityScoreObject"]["Str:HitProbability"])
+}
+
+function getObjectOfAbilityScoreChart(abilityScoreChart, abilityScoreChartKeys){
+    let resultObject = []
+    let breakPoint = 0
+    for(let i = 0; i < Object.entries(abilityScoreChart).length; i++){
+        if(abilityScoreChart[abilityScoreChartKeys[i]] != undefined){
+            resultObject[i] = [abilityScoreChartKeys[i], abilityScoreChart[abilityScoreChartKeys[i]]]
+            breakPoint++
+            if(breakPoint == abilityScoreChartKeys.length) break
+        }
+    }
+    buildAbilityScoreList(resultObject)
+    return Object.fromEntries(resultObject)
+}
+
+// insertIntoAbilityScoreList(abilityScoreChartId, pId, title)  ... "beforeend", `<p id="${pId}">${title}</p>`
+function buildAbilityScoreList(incObject){
+    let targetId = incObject[0][0].slice(0, 3) + 'Chart'
+    let scoreTitles = []
+
+    for(let i = 0; i < incObject.length; i++){
+        let id = incObject[i][0]
+        scoreTitles.push(abilityScoreChartNames(id))
+    }
+
+    for(let i = 0; i < scoreTitles.length; i++){
+        insertIntoAbilityScoreList("ability-score-chart-id", targetId, incObject[i][0], `${scoreTitles[i]}: `)
+    }
+}
+
+// Lots of BS here to add the space to the names.  Don't touch.
+function abilityScoreChartNames(id){
+    let targetTitle = id.slice(4)
+    let targetArrayBeginnings = []
+    let targetArrayEndings = []
+    let targetArray = []
+
+    targetArrayBeginnings = targetTitle.match(/[A-Z]/g)
+    targetArrayEndings = targetTitle.split(/[A-Z]/g)
+    targetArrayEndings.shift()
+    for(let i = 0; i < targetArrayBeginnings.length; i++){
+        targetArray[i] = targetArrayBeginnings[i] + targetArrayEndings[i]
+    }
+
+    return targetArray.join(' ')
+}
+
+function fillingAbilityScoreList(id){
+    let text = document.getElementById(id).innerText
+    console.log(characterObject["Int:NumberOfLanguages"])
+    text = text
 }
 
 function startingValues(){
@@ -297,8 +450,7 @@ function startingValues(){
     }
     
     characterStartingHP = roll(classJSON['Hit Points'])
-    characterStartingGold = roll(classJSON['Starting Gold'])
-    if(characterStartingGold < 6) characterStartingGold *= 10
+    characterGold = roll(classJSON['Starting Gold'])
     setStartingValues()
     unhidingEquipList()
     fillingArmorList()
@@ -306,7 +458,7 @@ function startingValues(){
 }
 
 function setStartingValues(){
-    document.getElementById('value-starting-gold').innerText = characterStartingGold
+    document.getElementById('value-starting-gold').innerText = characterGold
     document.getElementById('value-starting-hp').innerText = characterStartingHP
 }
 
@@ -318,7 +470,7 @@ function buyingEquipmentPreview(){
     if(armor != ''){
         for(let i = 0; i < armorList.length; i++) {
             if(armorList[i].Name == armor){
-                cost += parseFloat(armorList[i].Cost)
+                cost += Number(armorList[i].Cost)
                 setAC(armorList[i].AC)
                 break
             } 
@@ -327,7 +479,7 @@ function buyingEquipmentPreview(){
     if(weapon != ''){
         for(let i = 0; i < weaponList.length; i++) {
             if(weaponList[i].Name == weapon){
-                cost += parseFloat(weaponList[i].Cost)
+                cost += Number(weaponList[i].Cost)
                 break
             } 
         }
@@ -336,44 +488,39 @@ function buyingEquipmentPreview(){
 }
 
 function buyingEquipment(){
-    let cost = parseFloat(document.getElementById('cost').innerText)
+    let cost = Number(document.getElementById('cost').innerText)
 
-    for (let i = 0; i < weaponList.length; i++) {
-        if(weaponList[i].Name == document.getElementById('weapon').value) {
-            insertIntoEquipmentList('EquipmentList', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
-        | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
-        break
-        }
-    }
-
-    for (let i = 0; i < armorList.length; i++) {
-        if(armorList[i].Name == document.getElementById('armor').value){
-            insertIntoEquipmentList('EquipmentList', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
+    if(characterGold >= cost){    
+        for (let i = 0; i < weaponList.length; i++) {
+            if(weaponList[i].Name == document.getElementById('weapon').value) {
+                insertIntoEquipmentList('EquipmentList', weaponList[i].Name, `Cost: ${weaponList[i].Cost} | Weight: ${weaponList[i].Weight}
+            | Type: ${weaponList[i].Type} | Speed Factor: ${weaponList[i]['Speed Factor']} | S-M: ${weaponList[i].SM} | L: ${weaponList[i].L}`)
             break
+            }
         }
+
+        for (let i = 0; i < armorList.length; i++) {
+            if(armorList[i].Name == document.getElementById('armor').value){
+                insertIntoEquipmentList('EquipmentList', armorList[i].Name, `AC: ${armorList[i].AC} | Cost: ${armorList[i].Cost} | Weight: ${armorList[i].Weight}`)
+                break
+            }
+        }
+
+        characterGold = ((characterGold * 100) - (cost * 100)) / 100
+        setStartingValues()
+        fillingArmorList()
+        fillingWeaponList()
+
+        document.getElementById('cost').innerText = 0
+        document.getElementById('armor').value = ''
+        document.getElementById('weapon').value = ''
+    } else {
+        alert('You do not have enough gold for that.')
     }
-
-
-    document.getElementById('cost').innerText = 0
-    document.getElementById('armor').value = ''
-    document.getElementById('weapon').value = ''
 }
 
 
 
-
-
-
-// fun little stat line to test the system.  Remove before pushing.
-function noClassOptionsStatLine(){
-    characterStats = [8, 6, 18, 7, 8, 8]
-    characterStatsBonuses = [0, 0, 0, 0, 0, 0]
-    updateStats()
-    if(document.getElementById('selected-race') != null) document.getElementById('selected-race').value = ''
-    if(document.getElementById('selected-class') != null) document.getElementById('selected-class').value = ''
-
-    powerCheck(characterStats.reduce((a,b) => a + b))
-}
 
 // Remove later
 function listUndefinedErrorHandlerBS(){

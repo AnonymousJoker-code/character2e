@@ -22,15 +22,19 @@ let armorParse = undefined
 let weaponParse = undefined
 let raceParse = undefined
 let classParse = undefined
+let abilityScoreChartsParse = undefined
 
 const papaConfig = {
 	header: true,
+    skipEmptyLines: 'greedy',
 }
 
 const armorListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=0&single=true&output=csv'
 const weaponListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1660219728&single=true&output=csv'
 const raceListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1707483028&single=true&output=csv'
 const classListUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=734079155&single=true&output=csv'
+const abilityscorechartsUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1664533932&single=true&output=csv'
+const thac0Url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGecvX3EBMdZq1sgFnUxKxeYzMnVAiaL9prMak-kcoH3UxTaftWAtyI8kMrcqruF4lioRyCzJmIWj2/pub?gid=1469899465&single=true&output=csv'
 
 
 axios.get(armorListUrl).then((res) => {
@@ -63,6 +67,22 @@ axios.get(classListUrl).then((res) => {
 
 app.get('/classlist', async (req, res) => {
     res.send(classParse)
+})
+
+axios.get(abilityscorechartsUrl).then((res) => {
+    abilityScoreChartsParse = Papa.parse(res.data, papaConfig)
+})
+
+app.get('/abilityscorecharts', async (req, res) => {
+    res.send(abilityScoreChartsParse)
+})
+
+axios.get(thac0Url).then((res) => {
+    thac0Parse = Papa.parse(res.data, papaConfig)
+})
+
+app.get('/thac0', async (req, res) => {
+    res.send(thac0Parse)
 })
 
 app.listen(process.env.PORT || 3000)
