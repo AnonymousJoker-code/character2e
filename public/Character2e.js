@@ -21,8 +21,7 @@ let chaAbilityScoreObject = undefined
 let characterObject = undefined
 
 // Remove Later
-let undefinedBS = setInterval(listUndefinedErrorHandlerBS(), 1000)
-
+//let undefinedBS = setInterval(listUndefinedErrorHandlerBS(), 1000)
 window.onload = async function(){
     await getParsedData()
     getStats()
@@ -35,6 +34,7 @@ async function getParsedData(){
     await axios.get('/classlist').then((res) => getClassList(res.data.data))
     await axios.get('/abilityscorecharts').then((res) => getAbilityScoreCharts(res.data.data))
     await axios.get('/thac0').then((res) => getThac0(res.data.data))
+    return 'Hopefully everything has been parsed. ¯\\_(ツ)_/¯'
 }
 
 function clearHTMLElement(elementId){
@@ -135,7 +135,6 @@ function updateStats(){
         characterStatsDisplayed[i] = parseInt(characterStats[i]) + parseInt(characterStatsBonuses[i])
         statValues[i].innerHTML = characterStatsDisplayed[i]
     }
-    aggregatingAbilityScoreChart()
 }
 
 // Checking the power level of the generated character based on the given values.
@@ -189,7 +188,10 @@ function insertIntoEquipmentList(EquipmentListId, header, sub){
 }
 
 function insertIntoAbilityScoreList(abilityScoreChartId, divId,pId, title){
-    document.getElementById(abilityScoreChartId).insertAdjacentHTML("beforeend", `<div id="${divId}"><p id="${pId}">${title}</p></div>`)
+    if(document.getElementById(divId) == null){
+      document.getElementById(abilityScoreChartId).insertAdjacentHTML("beforeend", `<div class="charts" id="${divId}"></div>`)
+    }
+     document.getElementById(divId).insertAdjacentHTML("beforeend", `<p id="${pId}">${title}</p>`)
 }
 
 // Building the datalist options for armor and weapons.
@@ -383,7 +385,6 @@ function filterAggragatedAbilityScoreChart(chart){
         wisAbilityScoreObject,
         chaAbilityScoreObject
     }
-    console.log(characterObject["strAbilityScoreObject"]["Str:HitProbability"])
 }
 
 function getObjectOfAbilityScoreChart(abilityScoreChart, abilityScoreChartKeys){
@@ -397,6 +398,7 @@ function getObjectOfAbilityScoreChart(abilityScoreChart, abilityScoreChartKeys){
         }
     }
     buildAbilityScoreList(resultObject)
+    breakPoint //?
     return Object.fromEntries(resultObject)
 }
 
@@ -428,14 +430,25 @@ function abilityScoreChartNames(id){
     for(let i = 0; i < targetArrayBeginnings.length; i++){
         targetArray[i] = targetArrayBeginnings[i] + targetArrayEndings[i]
     }
-
     return targetArray.join(' ')
 }
 
-function fillingAbilityScoreList(id){
-    let text = document.getElementById(id).innerText
-    console.log(characterObject["Int:NumberOfLanguages"])
-    text = text
+function fillingAbilityScoreList(){
+    let characterArray = Object.entries(characterObject)
+   
+    for(let i = 0; i < characterArray.length; i++){
+        const x = Object.entries(characterArray[i][1])
+        for(let j = 0; j < x.length; j++){
+            const id = x[j][0]
+            const value = x[j][1]
+            actualFillingOfAbilityScoreList(id, value)
+        }
+    }
+}
+ 
+function actualFillingOfAbilityScoreList(id, value){
+    let doc = document.getElementById(id)
+    doc.innerText += ` ${value}`
 }
 
 function startingValues(){
@@ -455,6 +468,8 @@ function startingValues(){
     unhidingEquipList()
     fillingArmorList()
     fillingWeaponList()
+    aggregatingAbilityScoreChart()
+    fillingAbilityScoreList()
 }
 
 function setStartingValues(){
@@ -520,17 +535,15 @@ function buyingEquipment(){
 }
 
 
-
-
 // Remove later
-function listUndefinedErrorHandlerBS(){
-    if(raceList) {
-        clearInterval(undefinedBS)
-        console.error('Undefined BS happened again.')
-    }
-    if(raceList == undefined) axios.get('/racelist').then((res) => getRaceList(res.data.data))
-    raceOptions()
-}
+// function listUndefinedErrorHandlerBS(){
+//     if(raceList) {
+//         clearInterval(undefinedBS)
+//         console.error('Undefined BS happened again.')
+//     }
+//     if(raceList == undefined) axios.get('/racelist').then((res) => getRaceList(res.data.data))
+//     raceOptions()
+// }
 
 // Playing around with 'staging' the build
 function unhidingEquipList(){
