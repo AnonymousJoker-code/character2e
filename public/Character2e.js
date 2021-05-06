@@ -53,6 +53,7 @@ function nukeEverything(){
     clearHTMLElement('weapon')
     document.getElementById('value-starting-gold').innerText = 0
     document.getElementById('value-starting-hp').innerText = 0
+    clearHTMLElement('ability-score-chart-id')
 }
 
 // Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
