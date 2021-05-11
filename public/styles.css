@@ -2,10 +2,21 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/*
+ #1b262c #0f4c75 #3282b8 #bbe1fa
+ #393e46 #00adb5 #aad8d3 #eeeeee
+ */
+
+ :root {
+     --background-color: #393e46;
+     --shadow-color: #00adb5;
+     --main-text-color: #aad8d3;
+     --highlight-color: #eeeeee;
+ }
+
 body {
-    background-color: #131313;
-    color: #ecba03;
-    /* background-image: linear-gradient(270deg, #a01000, blue); */
+    background-color: var(--background-color);
+    color: var(--main-text-color);
     font-size: 1.5em;
 }
 
@@ -25,7 +36,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* margin-left: 50%; */
 }
 
 #reroll {
@@ -49,15 +59,16 @@ body {
     justify-content: center;
     border-style: solid;
     border-width: 1px;
-    border-color: white;
+    border-color: var(--highlight-color);
     max-width: 15%;
     min-width: 10%;
     padding: 10px;
+    box-shadow: 10px 5px 5px var(--shadow-color);
 }
 
 .stat {
     padding-right: 10px;
-    color: #c9fdea;
+    color: var(--main-text-color);
 }
 
 .EquipList {
@@ -66,6 +77,7 @@ body {
     align-items: center;
     margin-top: 1em;
     opacity: 0;
+    box-shadow: 10px 5px 5px var(--shadow-color);
 }
 
 .AC {
@@ -82,6 +94,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 10px 5px 5px var(--main-text-color);
 }
 
 .starting-class {
@@ -110,4 +123,25 @@ body {
 
 .Equipment {
     padding: 0 0 10px 10px;
+}
+
+.ability-score-charts{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-evenly;
+}
+
+.charts {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: left;
+    width: 10%;
+    padding: 10px;
+    font-size: small;
+}
+
+.colorStatVal {
+    color: var(--highlight-color);
 }

@@ -48,12 +48,13 @@ function nukeEverything(){
         document.getElementById('AC').style.opacity = 0
     }
     setAC(10)
+    characterStatsBonuses = [0,0,0,0,0,0]
     clearHTMLElement('EquipmentList')
     clearHTMLElement('armor')
     clearHTMLElement('weapon')
+    clearHTMLElement('ability-score-chart-id')
     document.getElementById('value-starting-gold').innerText = 0
     document.getElementById('value-starting-hp').innerText = 0
-    clearHTMLElement('ability-score-chart-id')
 }
 
 // Cleaning the die input to get the correct number of dice and sides of the dice being rolled. Also figuring out the correct bonus that needs to be applied to the total.
@@ -134,7 +135,7 @@ function updateStats(){
 
     for(let i = 0; i < characterStatsBonuses.length; i++){
         characterStatsDisplayed[i] = parseInt(characterStats[i]) + parseInt(characterStatsBonuses[i])
-        statValues[i].innerHTML = characterStatsDisplayed[i]
+        statValues[i].innerText = characterStatsDisplayed[i]
     }
 }
 
@@ -353,6 +354,7 @@ function aggregatingAbilityScoreChart(){
             if(abilityScoreChart[i].AbilityScore == characterStatsDisplayed[j]) abilityScoreLineAggregate.push(abilityScoreChart[i])
         }
     }
+    clearHTMLElement('ability-score-chart-id')
     filterAggragatedAbilityScoreChart(abilityScoreLineAggregate)
 }
 
@@ -399,11 +401,9 @@ function getObjectOfAbilityScoreChart(abilityScoreChart, abilityScoreChartKeys){
         }
     }
     buildAbilityScoreList(resultObject)
-    breakPoint //?
     return Object.fromEntries(resultObject)
 }
 
-// insertIntoAbilityScoreList(abilityScoreChartId, pId, title)  ... "beforeend", `<p id="${pId}">${title}</p>`
 function buildAbilityScoreList(incObject){
     let targetId = incObject[0][0].slice(0, 3) + 'Chart'
     let scoreTitles = []
@@ -449,7 +449,7 @@ function fillingAbilityScoreList(){
  
 function actualFillingOfAbilityScoreList(id, value){
     let doc = document.getElementById(id)
-    doc.innerText += ` ${value}`
+    doc.innerHTML += `<span class='colorStatVal'> ${value}</span>`
 }
 
 function startingValues(){
@@ -556,4 +556,13 @@ function unhidingEquipList(){
     }// else {
        // x.style.opacity = 0
    //}
+}
+
+
+function perfection(){
+    for (let i = 0; i < 6; i++) {
+        characterStats[i] = 25
+    }
+    updateStats()
+    nukeEverything()
 }

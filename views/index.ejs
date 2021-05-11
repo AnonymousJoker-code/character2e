@@ -1,11 +1,10 @@
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <h1 id="title">2e Quick Character Creator</h1>
 
 <div class="setup">
     <p>Min total score value: <input id="minStats" type="number" value="54"></p>
     <p>Max total score value: <input id="maxStats" type="number" value="108"></p>
     <p>Total score value: </p>
-    <p id="totalStats">0</p>
+    <p class="colorStatVal" id="totalStats">0</p>
 </div>
 
 <button class="button" id="reroll" onClick=getStats()>Roll!</button>
@@ -16,49 +15,47 @@
         <div class="stat">
             <p id="stat-Str">STR: </p>
         </div>
-        <p class="statVal" id="valStr">0</p>
+        <p class="statVal colorStatVal" id="valStr">0</p>
     </div>
 
     <div class="Dex-container">
         <div class="stat">
             <p id="stat-Dex">DEX: </p>
         </div>
-        <p class="statVal" id="valDex">0</p>
+        <p class="statVal colorStatVal" id="valDex">0</p>
     </div>
 
     <div class="Con-container">
         <div class="stat">
             <p id="stat-Con">CON: </p>
         </div>
-        <p class="statVal" id="valCon">0</p>
+        <p class="statVal colorStatVal" id="valCon">0</p>
     </div>
 
     <div class="Int-container">
         <div class="stat">
             <p id="stat-Int">INT: </p>
         </div>
-        <p class="statVal" id="valInt">0</p>
+        <p class="statVal colorStatVal" id="valInt">0</p>
     </div>
 
     <div class="Wis-container">
         <div class="stat">
             <p id="stat-Wis">WIS: </p>
         </div>
-        <p class="statVal" id="valWis">0</p>
+        <p class="statVal colorStatVal" id="valWis">0</p>
     </div>
     
     <div class="Cha-container">
         <div class="stat">
             <p id="stat-Cha">CHA: </p>
         </div>
-        <p class="statVal" id="valCha">0</p>
+        <p class="statVal colorStatVal" id="valCha">0</p>
     </div>
 </div>
 
 <div class="ability-score-charts" id="ability-score-chart-id">
-    
 </div>
-
 
 <fieldset class="race-and-class">
     <legend>Race and Class</legend>
@@ -76,14 +73,14 @@
             <div class="starting-title">
                 <p id="starting-hp-text">Starting HP: </p>
             </div>
-            <p class="starting-gold-hp" id="value-starting-hp">0</p>
+            <p class="starting-gold-hp colorStatVal" id="value-starting-hp">0</p>
         </div>
 
         <div class="starting-class">
             <div class="starting-title">
                 <p id="starting-gold-text">Starting Gold: </p>
             </div>
-            <p class="starting-gold-value" id="value-starting-gold">0</p>
+            <p class="starting-gold-value colorStatVal" id="value-starting-gold">0</p>
         </div>
 </fieldset>
 
@@ -105,7 +102,7 @@
             <div class="starting-items-cost">
                 <p id="starting-cost-text">Cost: </p>
             </div>
-            <p class="starting-cost-value" id="cost">0</p>
+            <p class="starting-cost-value colorStatVal" id="cost">0</p>
         </div>
 </fieldset>
 
@@ -116,10 +113,8 @@
 
 <div>
     <dl id="EquipmentList">
-
     </dl>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="Character2e.js"></script>
