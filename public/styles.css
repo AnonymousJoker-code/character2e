@@ -9,8 +9,8 @@
 
  :root {
      --background-color: #393e46;
-     --shadow-color: #00adb5;
-     --main-text-color: #aad8d3;
+     --main-text-color: #00adb5;
+     --shadow-color: #aad8d3;
      --highlight-color: #eeeeee;
  }
 
@@ -94,7 +94,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 10px 5px 5px var(--main-text-color);
+    box-shadow: 10px 5px 5px var(--shadow-color);
 }
 
 .starting-class {
